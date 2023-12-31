@@ -5,6 +5,7 @@ import { defaultStyles } from '@/constants/Styles'
 import Colors from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
 import { useOAuth } from '@clerk/clerk-expo'
+import { useRouter } from 'expo-router'
 
 enum Strategy {
   Apple = 'oauth_apple',
@@ -14,6 +15,8 @@ enum Strategy {
 
 const Page = () => {
   useWarmUpBrowser() // browser is fine on android
+
+  const router = useRouter()
 
   const { startOAuthFlow: appleAuth } = useOAuth({strategy: 'oauth_apple'});
   const { startOAuthFlow: googleAuth } = useOAuth({strategy: 'oauth_google'});
@@ -32,10 +35,11 @@ const Page = () => {
 
       if (createdSessionId) {  // user is authenticated
         setActive!({session: createdSessionId})
+        router.back()
       }
 
     } catch (error) {
-      return null
+      console.error("Auth error: ", error)
     }
   }
 
