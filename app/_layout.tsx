@@ -9,7 +9,7 @@ import { ClerkProvider, useAuth } from '@clerk/clerk-expo';
 
 const CLERK_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY
 
-// 1.03.59
+// 1.32.43
 
 const tokenCache = {
   async getToken(key: string) {

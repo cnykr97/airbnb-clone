@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react'
 import { Link } from 'expo-router';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
+import * as Haptics from 'expo-haptics'
 
 const categories = [
   {
@@ -37,11 +38,21 @@ const categories = [
 
 const ExploreHeader = () => {
 
+  const scrollRef = useRef<ScrollView>(null)
   const itemsRef = useRef<Array<TouchableOpacity | null>>([])
   const [activeIndex, setactiveIndex] = useState(0)
 
   const selectCategory = (index: number) => {
+
+    const selected = itemsRef.current[index]
     setactiveIndex(index)
+    
+    selected?.measure((x) => {
+      scrollRef.current?.scrollTo({x: x, y: 0, animated: true})
+    })
+    
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+
   }
 
   return (
@@ -62,23 +73,24 @@ const ExploreHeader = () => {
           </TouchableOpacity>
         </View>
         <ScrollView 
+          ref={scrollRef}
           horizontal 
           showsHorizontalScrollIndicator={false} 
           contentContainerStyle={{
             alignItems: 'center',
-            gap: 20,
+            gap: 30,
             paddingHorizontal: 15
           }}
         >
           {categories.map((category, index) => 
             <TouchableOpacity
               key={index}
-              ref={(element) => itemsRef.current[index] = element}
+              ref={(element) => itemsRef.current[index] === element}
               style={activeIndex === index ? styles.categortiesBtnActive : styles.categortiesBtnInactive}
               onPress={() => selectCategory(index)}
             >
-              <MaterialIcons name={category.icon as any} size={24}/>
-              <Text>{category.name}</Text>
+              <MaterialIcons name={category.icon as any} size={24} color={activeIndex === index ? Colors.primary : Colors.grey} />
+              <Text style={activeIndex === index ? styles.categoriesTextActive : styles.categoriesTextInactive} >{category.name}</Text>
             </TouchableOpacity>
           )}
         </ScrollView>
@@ -145,13 +157,21 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       paddingBottom: 8,
       borderBottomWidth: 2,
-      borderBottomColor: '#000',
+      borderBottomColor: Colors.primary,
     },
     categortiesBtnInactive: {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
       paddingBottom: 8,
+    },
+    categoriesTextActive: {
+      fontFamily: 'mon-b',
+      color: Colors.primary
+    },
+    categoriesTextInactive: {
+      fontFamily: 'mon-sb',
+      color: Colors.grey
     }
 });
 
